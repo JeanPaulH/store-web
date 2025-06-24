@@ -1,0 +1,36 @@
+services:
+    sw_database_local:
+      container_name: sw_database_local
+      image: postgis/postgis:17-3.5
+      volumes:
+        - backend_postgres_data_sos:/var/lib/postgresql/data/
+      restart: always
+      # environment:
+      #   - DATABASE_HOST=${DATABASE_HOST_DEV}
+      #   - POSTGRES_USER=${DATABASE_USER}
+      #   - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      #   - POSTGRES_DB=${DATABASE_NAME}
+      environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
+        - POSTGRES_DB=store_db
+        - DATABASE_HOST=localhost
+      
+    sw_backend_local:
+      container_name: sw_backend_local
+      image: jeanpaul20173/backend-store-clean:latest
+      restart: always
+      command:
+        - /bin/sh
+        - -c
+        - |
+          python manage.py runserver 0.0.0.0:80
+      volumes:
+        - .:/code
+      depends_on:
+        - sw_database_local
+      ports:
+        - "8000:80"
+volumes:
+  backend_postgres_data_sos:
+        
